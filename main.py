@@ -18,7 +18,6 @@ class Application(tkinter.ttk.Frame):
         self.master.rowconfigure(index=0, weight=1)
         self.master.columnconfigure(index=0, weight=1)
 
-        # self.con = Connect("python", "user14", "user14", "LisenseServer\\sqlexpress")
         self.people = con.get_staff_all()
 
         columns = ("T_Number", "Surname", "Lastname", "BirthDay",
@@ -29,13 +28,13 @@ class Application(tkinter.ttk.Frame):
         self.tree.grid(row=0, column=0, sticky="nsew")
 
         self.tree.heading("T_Number", text="Номер", anchor=W)
-        self.tree.heading("Surname", text="Имя", anchor=W)
-        self.tree.heading("Lastname", text="Фамилия", anchor=W)
-        self.tree.heading("BirthDay", text="Дата рождения", anchor=W)
-        self.tree.heading("Phone", text="Телефон", anchor=W)
-        self.tree.heading("Post", text="Должность", anchor=W)
-        self.tree.heading("Date_input", text="Дата трудоустройства", anchor=W)
-        self.tree.heading("Type_post", text="Тип должности", anchor=W)
+        self.tree.heading("Surname", text="Имя", anchor=W, command=lambda: self.sort(1, False))
+        self.tree.heading("Lastname", text="Фамилия", anchor=W, command=lambda: self.sort(2, False))
+        self.tree.heading("BirthDay", text="Дата рождения", anchor=W, command=lambda: self.sort(3, False))
+        self.tree.heading("Phone", text="Телефон", anchor=W, command=lambda: self.sort(4, False))
+        self.tree.heading("Post", text="Должность", anchor=W, command=lambda: self.sort(5, False))
+        self.tree.heading("Date_input", text="Дата трудоустройства", anchor=W, command=lambda: self.sort(6, False))
+        self.tree.heading("Type_post", text="Тип должности", anchor=W, command=lambda: self.sort(7, False))
 
         self.tree.column("#0", stretch=YES, width=100)
         self.tree.column("#1", stretch=YES, width=100)
@@ -78,7 +77,7 @@ class Application(tkinter.ttk.Frame):
         self.tree.delete(self.tree.selection())
 
     def selection_update(self):
-        res=Add_people(master=tkinter.Toplevel(), parent=self, staff=self.popup.selection)
+        res = Add_people(master=tkinter.Toplevel(), parent=self, staff=self.popup.selection)
         self.update_table(res)
 
     def update_table(self, res):
@@ -98,6 +97,13 @@ class Application(tkinter.ttk.Frame):
         finally:
             # make sure to release the grab (Tk 8.0a1 only)
             self.popup.grab_release()
+
+    def sort(self, col, reverse):
+        spook = [(self.tree.set(k, col), k) for k in self.tree.get_children("")]
+        spook.sort(reverse=reverse)
+        for index, (_, k) in enumerate(spook):
+            self.tree.move(k, "", index)
+        self.tree.heading(col, command=lambda: self.sort(col, not reverse))
 
 
 root = tkinter.Tk()
